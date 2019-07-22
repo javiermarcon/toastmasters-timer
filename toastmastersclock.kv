@@ -1,0 +1,51 @@
+<Label>:
+    font_size: 40
+    color: 0,0,0,1
+    markup: True
+
+<ClockLabel@Label>:
+    font_size: 30
+	text: '00:00:00'
+
+<TimerLabel@Label>:
+    font_size: 60
+	text: '[b]00:00.[size=40]00[/size][/b]'
+
+<RootWidget>:
+
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+	BoxLayout:
+	    orientation: 'vertical'
+
+	    ClockLabel:
+	        id: time
+
+	    BoxLayout:
+	        height: 90
+	        orientation: 'horizontal'
+	        padding: 20
+	        spacing: 20
+	        size_hint: (1, None)
+
+	        Button:
+	            id: start_stop
+	            background_color: (1,0,0,1) if app.sw_started else (0,1,0,1)
+                background_normal: ""
+                #background_down: "" #optional if you want your color pressed
+	            text: 'Start'
+	            on_press: app.start_stop()
+
+	        Button:
+	            id: reset
+	            text: 'Reset'
+	            on_press: app.reset()
+
+	    TimerLabel:
+	        id: stopwatch
+

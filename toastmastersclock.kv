@@ -22,6 +22,14 @@
 	BoxLayout:
 	    orientation: 'vertical'
 
+
+		Spinner:
+			id: spinner_1
+			size_hint: 1, 0.3
+	        text: app.spinnerText
+	        values: app.spinnerValues
+		    #on_text: app.spinnerChanged(spinner_1.text)
+
 	    ClockLabel:
 	        id: time
 

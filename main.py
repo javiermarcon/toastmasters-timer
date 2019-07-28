@@ -99,6 +99,7 @@ class toastmastersclockApp(App):
     #    print(textValue)
 
     def build(self):
+        self.icon = 'assets/icon.png'
         root = RootWidget()
         spinner_values = self._get_spinner_values()
         self.spinnerValues = spinner_values

@@ -21,6 +21,26 @@ categoriesTimes["Speech"] = { 5 * 60 : "green", 6 * 60 : "yellow", 7 * 60: "red"
 categoriesTimes["Sprint"] = { 8 * 60 : "green", 9 * 60 : "yellow", 10 * 60: "red" }
 categoriesTimes["Test"] = { 2 : "green", 3 : "yellow", 4: "red" }
 
+intervals = (
+    ('w', 604800),  # 60 * 60 * 24 * 7
+    ('d', 86400),    # 60 * 60 * 24
+    ('h', 3600),    # 60 * 60
+    ('m', 60),
+    ('s', 1),
+    )
+
+def display_time(seconds, granularity=2):
+    result = []
+
+    for name, count in intervals:
+        value = seconds // count
+        if value:
+            seconds -= value * count
+            if value == 1:
+                name = name.rstrip('s')
+            result.append("{} {}".format(value, name))
+    return ', '.join(result[:granularity])
+
 class RootWidget(BoxLayout):
     pass
 
@@ -28,8 +48,16 @@ class toastmastersclockApp(App):
     sw_started = BooleanProperty(False)
     sw_seconds = 0
     background = ListProperty()
-    spinnerValues = ListProperty(categoriesTimes.keys())
-    spinnerText = StringProperty(list(categoriesTimes.keys())[0])
+    spinnerValues = ListProperty()
+    spinnerText = StringProperty()
+
+    def _get_spinner_values(self):
+        labels = []
+        for category in categoriesTimes.keys():
+            minval = display_time(min(categoriesTimes[category]))
+            maxval = display_time(max(categoriesTimes[category]))
+            labels.append('{} : {} - {}'.format(category, minval, maxval))
+        return labels
 
     def update_time(self, nap):
         if self.sw_started:
@@ -45,7 +73,8 @@ class toastmastersclockApp(App):
 
     def _check_elapsed_time(self):
         """Checks the elapsed time and changes the backgroun accordingly"""
-        selectedCategory = categoriesTimes[self.root.ids.spinner_1.text]
+        category_string = self.root.ids.spinner_1.text.split(':')[0].strip()
+        selectedCategory = categoriesTimes[category_string]
         for seconds in selectedCategory:
             if int(self.sw_seconds) == seconds:
                 self.background = colors[selectedCategory[seconds]]
@@ -71,7 +100,9 @@ class toastmastersclockApp(App):
 
     def build(self):
         root = RootWidget()
-
+        spinner_values = self._get_spinner_values()
+        self.spinnerValues = spinner_values
+        self.spinnerText = spinner_values[0]
         self.reset()
         return root
 

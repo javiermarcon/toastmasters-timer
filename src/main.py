@@ -107,5 +107,10 @@ class toastmastersclockApp(App):
         self.reset()
         return root
 
+    def do_quit(self, *largs):
+        # print('App quit')
+        self.root_window.close()  # Fix app exit on Android.
+        return super(toastmastersclockApp, self).stop(*largs)
+
 if __name__ == '__main__':
     toastmastersclockApp().run()

@@ -3,6 +3,13 @@
     color: 0,0,0,1
     markup: True
 
+<Button>:
+	canvas.after:
+        Color:
+            rgb: 0,0,0
+        Line:
+            rectangle: self.x+1,self.y+1,self.width-1,self.height-1
+
 <ClockLabel@Label>:
     font_size: 30
 	text: '00:00:00'
@@ -25,7 +32,7 @@
 
 		Spinner:
 			id: spinner_1
-			size_hint: 1, 0.3
+			size_hint_y: 0.3
 	        text: app.spinnerText
 	        values: app.spinnerValues
 		    #on_text: app.spinnerChanged(spinner_1.text)
@@ -55,4 +62,15 @@
 
 	    TimerLabel:
 	        id: stopwatch
+
+	    BoxLayout:
+	        orientation: 'horizontal'
+
+	        Label:
+				size_hint: 3, 0.3
+
+	        Button:
+	            size_hint_y: 0.3
+	            text: 'Salir'
+                on_press: app.do_quit()
 

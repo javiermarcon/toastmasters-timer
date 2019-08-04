@@ -15,11 +15,12 @@ from kivy.properties import BooleanProperty, ListProperty, StringProperty
 from kivy.uix.spinner import Spinner
 
 colors = { "green": [0, 1, 0, 1], "yellow": [1, 1, 0, 1], "red": [1, 0, 0, 1] }
-categoriesTimes = OrderedDict()
-categoriesTimes["Impromptu"] = { 60 : "green", 90 : "yellow", 120: "red" }
-categoriesTimes["Speech"] = { 5 * 60 : "green", 6 * 60 : "yellow", 7 * 60: "red" }
-categoriesTimes["Sprint"] = { 8 * 60 : "green", 9 * 60 : "yellow", 10 * 60: "red" }
-categoriesTimes["Test"] = { 2 : "green", 3 : "yellow", 4: "red" }
+speechTypes = OrderedDict()
+speechTypes["Impromptu"] = { 60 : "green", 90 : "yellow", 120: "red" }
+speechTypes["Speech"] = { 5 * 60 : "green", 6 * 60 : "yellow", 7 * 60: "red" }
+speechTypes["Evaluation"] = { 120 : "green", 150 : "yellow", 180: "red" }
+speechTypes["Sprint"] = { 8 * 60 : "green", 9 * 60 : "yellow", 10 * 60: "red" }
+speechTypes["Test"] = { 2 : "green", 3 : "yellow", 4: "red" }
 
 intervals = (
     ('w', 604800),  # 60 * 60 * 24 * 7
@@ -53,9 +54,9 @@ class toastmastersclockApp(App):
 
     def _get_spinner_values(self):
         labels = []
-        for category in categoriesTimes.keys():
-            minval = display_time(min(categoriesTimes[category]))
-            maxval = display_time(max(categoriesTimes[category]))
+        for category in speechTypes.keys():
+            minval = display_time(min(speechTypes[category]))
+            maxval = display_time(max(speechTypes[category]))
             labels.append('{} : {} - {}'.format(category, minval, maxval))
         return labels
 
@@ -74,7 +75,7 @@ class toastmastersclockApp(App):
     def _check_elapsed_time(self):
         """Checks the elapsed time and changes the backgroun accordingly"""
         category_string = self.root.ids.spinner_1.text.split(':')[0].strip()
-        selectedCategory = categoriesTimes[category_string]
+        selectedCategory = speechTypes[category_string]
         for seconds in selectedCategory:
             if int(self.sw_seconds) == seconds:
                 self.background = colors[selectedCategory[seconds]]

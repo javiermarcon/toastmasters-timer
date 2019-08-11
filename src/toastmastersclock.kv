@@ -4,6 +4,7 @@
     markup: True
 
 <Button>:
+	background_color: (0,0.8,0.8,0.4)
 	canvas.after:
         Color:
             rgb: 0,0,0
@@ -49,7 +50,7 @@
 
 	        Button:
 	            id: start_stop
-	            background_color: (1,0,0,1) if app.sw_started else (0,1,0,1)
+	            background_color: (1,0,0,0.4) if app.sw_started else (0,1,0,0.4)
                 background_normal: ""
                 #background_down: "" #optional if you want your color pressed
 	            text: 'Start'

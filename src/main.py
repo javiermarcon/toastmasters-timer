@@ -10,6 +10,7 @@ from collections import OrderedDict
 
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.utils import platform
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import BooleanProperty, ListProperty, StringProperty
 from kivy.uix.spinner import Spinner
@@ -110,7 +111,8 @@ class toastmastersclockApp(App):
 
     def do_quit(self, *largs):
         # print('App quit')
-        self.root_window.close()  # Fix app exit on Android.
+        if platform == 'android':
+            self.root_window.close()  # Fix app exit on Android.
         return super(toastmastersclockApp, self).stop(*largs)
 
 if __name__ == '__main__':

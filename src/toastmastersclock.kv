@@ -30,13 +30,22 @@
 	BoxLayout:
 	    orientation: 'vertical'
 
+		BoxLayout:
+	        orientation: 'horizontal'
+	        size_hint_y: 0.3
 
-		Spinner:
-			id: spinner_1
-			size_hint_y: 0.3
-	        text: app.spinnerText
-	        values: app.spinnerValues
-		    #on_text: app.spinnerChanged(spinner_1.text)
+			Spinner:
+				id: category
+				size_hint_x: 0.3
+		        text: '< Select >'
+		        values: app.categoryValues
+			    on_text: app.category_changed(category.text)
+
+			Spinner:
+				id: speechName
+				size_hint_x: 0.7
+		        text: '< Select >'
+		        values: app.speechNameValues
 
 	    ClockLabel:
 	        id: time

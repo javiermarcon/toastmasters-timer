@@ -122,6 +122,7 @@ class Simulator(object):
     def assert_exists(self, selector, to_mark=True):
         self.rebuild_tree()
         nodes = self.tree.xpath(selector)
+        print (dir(nodes[0]), len(nodes))
         assert nodes, ("%s not found in widgets tree" % selector)
         if len(nodes) > 1:
             raise RuntimeError("Multiple nodes found for selector %s" % selector)

@@ -1,10 +1,25 @@
+#:import get_color kivy.utils.get_color_from_hex
+
+<InterfaceWithSidebar>:
+	canvas.before:
+        Color:
+            rgba: 1,1,1,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<SettingColorPicker>:
+    Label:
+        color: get_color(root.value) if root.value else (1,1,1,1.)
+        text: root.value or ''
+
 <Label>:
     font_size: 40
     color: 0,0,0,1
     markup: True
 
 <Button>:
-	background_color: (0,0.8,0.8,0.4)
+	background_color: (0.8,1,1,1)
 	canvas.after:
         Color:
             rgb: 0,0,0
@@ -59,7 +74,7 @@
 
 	        Button:
 	            id: start_stop
-	            background_color: (1,0,0,0.4) if app.sw_started else (0,1,0,0.4)
+	            background_color: (1,0.3,0.3,1) if app.sw_started else (0.3,1,0.3,1)
                 background_normal: ""
                 #background_down: "" #optional if you want your color pressed
 	            text: 'Start'
@@ -75,6 +90,11 @@
 
 	    BoxLayout:
 	        orientation: 'horizontal'
+
+			Button:
+	            size_hint_y: 0.3
+	            text: 'Config'
+                on_press: app.open_settings()
 
 	        Label:
 				size_hint: 3, 0.3

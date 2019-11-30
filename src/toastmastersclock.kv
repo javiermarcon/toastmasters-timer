@@ -92,36 +92,51 @@
 	        orientation: 'horizontal'
 
 			Button:
-	            size_hint_y: 0.3
+	            size_hint_y: 0.5
 	            text: 'Config'
                 on_press: app.open_settings()
 
 	        Label:
-				size_hint: 0.2, 0.3
+				size_hint: 0.2, 0.5
 
 			Button:
-	            size_hint_y: 0.3
-	            font_size: 20
-	            text: 'Stop Session' if app.sess_started else 'Start Session'
-                on_press: app.session_change()
+	            size_hint_y: 0.5
+	            font_size: 30
+	            text: 'Reset\nsession'
+	            disabled: True if not app.sessTimes else False
+                on_press: app.session_reset()
 
 			Label:
-				size_hint: 0.2, 0.3
+				size_hint: 0.2, 0.5
 
             Button:
-	            size_hint_y: 0.3
-	            font_size: 20
-	            text: 'Sess. results ({})'.format(len(app.sessTimes))
+	            size_hint_y: 0.5
+	            font_size: 30
+	            text: 'Session\nresults ({})'.format(len(app.sessTimes))
 	            disabled: True if not app.sessTimes else False
                 on_press: app.session_show()
 
 			Label:
-				size_hint: 0.2, 0.3
+				size_hint: 0.2, 0.5
 
 	        Button:
-	            size_hint_y: 0.3
+	            size_hint_y: 0.5
 	            text: 'Exit'
                 on_press: app.do_quit()
+
+<sessLabel@Label>:
+    font_size: 40
+    color: 0,0,0,1
+    #markup: True
+    size_hint_y: None
+    height: self.texture_size[1]
+    background_color: 1, 1, 1, 1
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
 
 <sessionResults>:
     orientation: 'vertical'
@@ -132,22 +147,56 @@
             pos: self.pos
             size: self.size
 
-
     Label:
-        text: "You pressed the button"
+        text: "Session Times"
+        size_hint_y: 1
 
-    RV:
+    RecycleView:
         id: session_rv
-        size_hint_y: 2
-        viewclass: 'Label'
+        size_hint_y: 7
+        viewclass: 'sessLabel'
 
         RecycleBoxLayout:
-            default_size: None, dp(56)
-            default_size_hint: 1, 2
-            size_hint_y: 2
-            height: self.minimum_height
             orientation: 'vertical'
+            default_size: None, None
+            default_size_hint: 1, None
+            size_hint_y: None
+            height: self.minimum_height
 
     Button:
         text: "Close Results"
         on_press: app.close_results()
+        size_hint_y: 1
+
+<ConfirmPopup>:
+    height: content_id.height + 50
+    width: '400dp'
+    size_hint: (None, None)
+
+    BoxLayout:
+        orientation: 'vertical'
+        id: content_id
+        size_hint: (None, None)
+        height: self.minimum_height + 25
+        width: root.width - 25
+        canvas.before:
+            Color:
+                rgba: 1,1,1,1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        Label:
+            size_hint_y: None
+            height: self.texture_size[1]
+            text_size: (self.width, None)
+            text: root.text
+        GridLayout:
+            cols: 2
+            size_hint_y: None
+            height: '44sp'
+            Button:
+                text: 'Yes'
+                on_release: root.dispatch('on_answer',True)
+            Button:
+                text: 'No'
+                on_release: root.dispatch('on_answer',False)

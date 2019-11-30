@@ -12,6 +12,7 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.utils import platform
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
 from kivy.properties import BooleanProperty, ListProperty, StringProperty
 from kivy.uix.spinner import Spinner
 from kivy.uix.settings import Settings
@@ -73,78 +74,26 @@ class sessionResults(BoxLayout):
     pass
 
 
-class RV(RecycleView):
-    """
-    Muestra mensajes en la pantalla, poniendo los ultimos arriba.
-    Si ingreso el mismo mensaje 2 veces, se muestra una sola vez, pero en la posicion que le corresponde
-    a la ultima vez que se ingreso.
-    ver:
-        para funcionamiento general:
-        https://kivy.org/docs/api-kivy.uix.recycleview.html#kivy.uix.recycleview.RecycleView
-        para ocultarlo si no hay mensajes:
-        https://stackoverflow.com/questions/41985573/hiding-and-showing-a-widget-in-kivy
-    """
+class ConfirmPopup(Popup):
+    text = StringProperty()
 
-    messages = {} # the messages holded by the recicleview
-    last_msg_num = 0 # number of the last message holded
+    def __init__(self, **kwargs):
+        self.register_event_type('on_answer')
+        super(ConfirmPopup, self).__init__(**kwargs)
 
-    def __init__(self, reversed=False, **kwargs):
-        super(RV, self).__init__(**kwargs)
-        self.reversed = reversed
-        #[self.add_message("msg {}".format(x)) for x in range(40)]
-        self.redraw_messages()
-        """
-        [ self.add_message("msg {}".format(x)) for x in range(4) ]
-        [self.add_message("ASD {}".format(x)) for x in range(3,6)]
-        num1 = self.add_message("weeeriz")
-        num2 = self.add_message("weeeriz1")
-        [self.add_message("msg {}".format(x)) for x in range(3,6)]
-        self.remove_message_by_text("msg 2")
-        self.remove_message_by_num(num1)
-        pprint.pprint(self.messages)
-        """
-
-    def add_message(self, message):
-        self.last_msg_num = self.last_msg_num + 1
-        self.messages[message] = self.last_msg_num
-        self.redraw_messages()
-        return self.last_msg_num
-
-    def remove_message_by_num(self, message_num):
-        message = self.get_message_by_number(message_num)
-        if message:
-            self.remove_message_by_text(message)
-
-    def remove_message_by_text(self, message):
-        del self.messages[message]
-        self.redraw_messages()
-
-    def redraw_messages(self):
-
-        if self.messages:
-            dt = [{'text': x} for x in sorted(self.messages,
-                                              key=self.messages.__getitem__,
-                                              reverse=self.reversed)]
-            self.data = dt
-        else:
-            self.data = []
-
-    def get_message_by_number(self, number):
-        val = [k for k, v in self.messages.iteritems() if v == number]
-        if val:
-            return val[0]
-        return None
+    def on_answer(self, *args):
+        pass
 
 
 class toastmastersclockApp(App):
     sw_started = BooleanProperty(False)
-    sess_started = BooleanProperty(False)
     sw_seconds = 0
     background = ListProperty()
     categoryValues = ListProperty()
     defaultSpeechName = '< Select >'
     speechNameValues = ListProperty([defaultSpeechName])
     sessTimes = ListProperty([])
+    sessLastResult = BooleanProperty(False)
     popupWindow = None
 
     def update_time(self, nap):
@@ -183,13 +132,26 @@ class toastmastersclockApp(App):
         )
         self.sw_started = not self.sw_started
 
+    def speech_string(self):
+        return self.root.ids.speechName.text.split(':')[0].strip()
+
+    def get_time_str_resized(self):
+        return self.root.ids.stopwatch.text.replace('[size=40]','[size=30]')
+
+    def get_session_tuple(self):
+        return (self.speech_string(), self.get_time_str_resized(), self.background)
+
     def reset(self):
-        if self.sess_started:
-            add_tup = ( self.speech_string(), self.root.ids.stopwatch.text )
-            self.sessTimes.append(add_tup)
         if self.sw_started:
             self.root.ids.start_stop.text = 'Start'
             self.sw_started = False
+        if self.sw_seconds > 0:
+            add_tup = self.get_session_tuple()
+            if self.sessLastResult:
+                self.sessTimes[-1] = add_tup
+                self.sessLastResult = False
+            else:
+                self.sessTimes.append(add_tup)
         self.sw_seconds = 0
         self.background = get_color_from_hex(self._get_config_colors()['default'])
 
@@ -238,22 +200,42 @@ class toastmastersclockApp(App):
         ''' Definies the default colors for the application '''
         return { "min": '#00FF00', "med": '#FFFF00', "max": '#FF0000', 'default': '#000000' }
 
-    def session_change(self):
-        self.sess_started = not self.sess_started
+    def session_reset(self):
+        content = ConfirmPopup(text='Are you sure you want to reset session values?', title='reset session')
+        content.bind(on_answer=self._on_answer)
+        self.popup = content
+        self.popup.open()
+
+    def _on_answer(self, instance, answer):
+        self.popup.dismiss()
+        if answer:
+            self.sessTimes = []
 
     def session_show(self):
+        tup = self.get_session_tuple()
+        if not self.sw_started and self.sw_seconds > 0 and self.sessTimes[-1] != tup:
+            if self.sessLastResult:
+                self.sessTimes[-1] = tup
+            else:
+                self.sessTimes.append(tup)
+            self.sessLastResult = True
         show = sessionResults()
+        oldcat = ''
+        data = []
         for msg in self.sessTimes:
-            print(msg)
-            show.ids['session_rv'].add_message('{0}: {1}'.format(msg[0],msg[1]))
-        self.popupWindow = Popup(title="Session results", content=show, size_hint=(None, None), size=(400, 400))
+            if oldcat != msg[0]:
+                n = 0
+                oldcat = msg[0]
+                data.append(('[b]{}[/b]'.format(msg[0]),(1,1,1,1)))
+            n += 1
+            data.append(('{}: {}'.format(n, msg[1]), msg[2]))
+        show.ids['session_rv'].data = [{'text': x[0], 'background_color': x[1]} for x in data]
+        self.popupWindow = Popup(title="Session results", content=show, size_hint=(None, None), size=Window.size)
         self.popupWindow.open()
 
     def close_results(self):
         self.popupWindow.dismiss()
 
-    def speech_string(self):
-        return self.root.ids.speechName.text.split(':')[0].strip()
 
 if __name__ == '__main__':
     toastmastersclockApp().run()

@@ -26,7 +26,7 @@ from kivy.uix.recycleview import RecycleView
 from settingscolorpicker import SettingColorPicker
 
 speechTypes = {
-    'Speech' : {
+    'Toastmaster Speech' : {
             "Impromptu": { 60 : "min", 90 : "med", 120: "max" },
             "Speech": { 5 * 60 : "min", 6 * 60 : "med", 7 * 60: "max" },
             "Evaluation": { 120 : "min", 150 : "med", 180: "max" }
@@ -36,6 +36,10 @@ speechTypes = {
             "Sprint": { 8 * 60 : "min", 9 * 60 : "med", 10 * 60: "max" },
             "Demo": { 30 * 60 : "min", 35 * 60 : "med", 40 * 60: "max" }
             },
+    'Creactivos':{
+			"50 min":  { 40 * 60 : "min", 45 * 60 : "med", 50 * 60: "max" },
+            "5 min": { 3 * 60 : "min", 4 * 60 : "med", 5 * 60: "max" },
+				},
     'Test': {
             "Test": { 2 : "min", 3 : "med", 4: "max" }
             }
@@ -198,7 +202,7 @@ class toastmastersclockApp(App):
 
     def _default_colors(self):
         ''' Definies the default colors for the application '''
-        return { "min": '#00FF00', "med": '#FFFF00', "max": '#FF0000', 'default': '#000000' }
+        return { "min": '#00FF00', "med": '#FFFF00', "max": '#FF0000', 'default': '#000000', '_': '#000000' }
 
     def session_reset(self):
         content = ConfirmPopup(text='Are you sure you want to reset session values?', title='reset session')

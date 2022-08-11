@@ -26,7 +26,7 @@ from kivy.uix.recycleview import RecycleView
 from settingscolorpicker import SettingColorPicker
 
 speechTypes = {
-    'Toastmaster Speech' : {
+    'Toastmasters' : {
             "Impromptu": { 60 : "min", 90 : "med", 120: "max" },
             "Speech": { 5 * 60 : "min", 6 * 60 : "med", 7 * 60: "max" },
             "Evaluation": { 120 : "min", 150 : "med", 180: "max" }
@@ -114,7 +114,7 @@ class toastmastersclockApp(App):
 
     def _get_config_colors(self):
         '''Gets the colors configured in the settings'''
-        return {color: self.config.get('screen_colors', color) for color in self._default_colors()}
+        return {color: self.config.get('screencolors', color) for color in self._default_colors()}
 
     def _check_elapsed_time(self):
         """Checks the elapsed time and changes the backgroun accordingly"""
@@ -179,7 +179,7 @@ class toastmastersclockApp(App):
         return root
 
     def build_config(self, config):
-        config.setdefaults('screen_colors', self._default_colors())
+        config.setdefaults('screencolors', self._default_colors())
 
     def build_settings(self, settings):
         settings.register_type('colorpicker', SettingColorPicker)
@@ -188,7 +188,7 @@ class toastmastersclockApp(App):
             menu_colors.append({'type': 'colorpicker',
                                 'title': '{} color'.format(color),
                                 'desc': '{} color background'.format(color),
-                                'section': 'screen_colors',
+                                'section': 'screencolors',
                                 'key': color})
         settings.add_json_panel('display colors',
                                 self.config,
